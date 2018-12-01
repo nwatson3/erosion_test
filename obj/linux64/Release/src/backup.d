@@ -1,5 +1,6 @@
-obj/linux64/Release/src/src/main.o: \
- /home/pyotr/Git/erosion_test2/src/src/main.cpp \
+obj/linux64/Release/src/backup.o: \
+ /home/pyotr/Git/erosion_test2/src/backup.cpp \
+ /home/pyotr/Git/erosion_test2/src/ofApp.h \
  /home/pyotr/OpenFrameworks/of_v0.10.1_linux64gcc6_release/libs/openFrameworks/ofMain.h \
  /home/pyotr/OpenFrameworks/of_v0.10.1_linux64gcc6_release/libs/openFrameworks/utils/ofConstants.h \
  /home/pyotr/OpenFrameworks/of_v0.10.1_linux64gcc6_release/libs/tess2/include/tesselator.h \
@@ -523,8 +524,9 @@ obj/linux64/Release/src/src/main.o: \
  /home/pyotr/OpenFrameworks/of_v0.10.1_linux64gcc6_release/libs/openFrameworks/video/ofGstVideoPlayer.h \
  /home/pyotr/OpenFrameworks/of_v0.10.1_linux64gcc6_release/libs/openFrameworks/3d/of3dUtils.h \
  /home/pyotr/OpenFrameworks/of_v0.10.1_linux64gcc6_release/libs/openFrameworks/3d/ofCamera.h \
- /home/pyotr/OpenFrameworks/of_v0.10.1_linux64gcc6_release/libs/openFrameworks/3d/ofEasyCam.h \
- /home/pyotr/Git/erosion_test2/src/src/ofApp.h
+ /home/pyotr/OpenFrameworks/of_v0.10.1_linux64gcc6_release/libs/openFrameworks/3d/ofEasyCam.h
+
+/home/pyotr/Git/erosion_test2/src/ofApp.h:
 
 /home/pyotr/OpenFrameworks/of_v0.10.1_linux64gcc6_release/libs/openFrameworks/ofMain.h:
 
@@ -1607,5 +1609,3 @@ obj/linux64/Release/src/src/main.o: \
 /home/pyotr/OpenFrameworks/of_v0.10.1_linux64gcc6_release/libs/openFrameworks/3d/ofCamera.h:
 
 /home/pyotr/OpenFrameworks/of_v0.10.1_linux64gcc6_release/libs/openFrameworks/3d/ofEasyCam.h:
-
-/home/pyotr/Git/erosion_test2/src/src/ofApp.h:

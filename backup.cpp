@@ -14,7 +14,6 @@ float lerp(float x1, float x2, float w)
 }
 //--------------------------------------------------------------
 void ofApp::setup(){
-  ofSetFrameRate(144);
   counter = 0;
   for(int i = 0; i < SIZE; i++)
   {
@@ -54,16 +53,16 @@ void ofApp::update(){
   //www-ljk.imag.fr/Publications/Basilic/com.lmc.publi.PUBLI_Inproceedings@117681e94b6_fff75c/FastErosion_PG07.pdf
   float gravity = 1.0;
   float distance = 1.0;
-  float time_step = 0.01;
-  float sediment_capacity_constant = 0.3;
+  float time_step = 0.1;
+  float sediment_capacity_constant = 0.1;
   float dissolving_constant = 1;
   float sedimentation_constant = 1;
-  float evaporation_constant = 0.1;
+  float evaporation_constant = 0.0001;
 
   // rain
   for(int i = 0; i < SIZE; i++)
   {
-    //water[i] += 0.01;
+    //water[i] += 0.05;
   }
   //water[(int)ofRandom(SIZE)] = 0.1;
 
@@ -119,8 +118,6 @@ void ofApp::update(){
     water[i] += water_area_diff / distance;
 
     float passed_water = (pipe_flux_right[i-1] - pipe_flux_left[i] + pipe_flux_right[i] - pipe_flux_left[i+1]) / 2;
-
-
     float  average_water = (prev_water + water[i]) / 2;
     if(passed_water == 0)
     {
@@ -128,89 +125,94 @@ void ofApp::update(){
     }
     else
     {
-      if(passed_water == 0)
-      {
-        vel[i] = 0;
-      }
-      else
-      {
-        //vel[i] = time_step * passed_water / (distance * average_water);
-        vel[i] = passed_water / (distance * average_water);
-      }
+      vel[i] = passed_water / (distance * average_water);
     }
-
   }
 
-  /*
-  // erosion and deposition
+  // sediment dissolution
   for(int i = 0; i < SIZE; i++)
   {
     float local_angle;
     if(vel[i] > 0)
     {
-      local_angle = atan((heights[i+1] - heights[i-1]) / 2);
-    }
-    if(vel[i] < 0)
-    {
-      local_angle = atan((heights[i-1] - heights[i+1]) / 2);
-    }
-
-    float sediment_transport_cap = sediment_capacity_constant * local_angle * abs(vel[i]);
-
-    if(sediment_transport_cap > sed[i])
-    {
-      float eroded_sed = dissolving_constant * (sediment_transport_cap - sed[i]);
-      heights[i] -= eroded_sed;
-      sed[i] += eroded_sed;
+      local_angle = atan((heights[i] - heights[i+1]) / distance);
+      if(i == SIZE - 1)
+      {
+        local_angle = atan((heights[i-1] - heights[i]) / distance);
+      }
     }
     else
     {
-      float deposited_sed = sedimentation_constant * (sed[i] - sediment_transport_cap);
-      heights[i] += deposited_sed;
-      sed[i] -= deposited_sed;
+      local_angle = atan((heights[i] - heights[i-1]) / distance);
+      if(i == 0)
+      {
+        local_angle = atan((heights[i+1] - heights[i]) / distance);
+      }
+    }
+
+    float sediment_capacity = sediment_capacity_constant * sin(local_angle) * abs(vel[i]);
+    cout << sediment_capacity << endl;
+    cout << sed[i] << endl;
+    cout << sin(local_angle) << " " << abs(vel[i]) << endl;
+
+    if(sediment_capacity > sed[i])
+    {
+      float sediment_exchange = dissolving_constant * (sediment_capacity - sed[i]);
+      cout << "eroding: " << sediment_exchange << endl;
+      heights[i] -= sediment_exchange;
+      sed[i] += sediment_exchange;
+    }
+    else if(sediment_capacity < sed[i])
+    {
+      
+      float sediment_exchange = sedimentation_constant * (sed[i] - sediment_capacity);
+      cout << "depositing: " << sediment_exchange << endl;
+      heights[i] += sediment_exchange;
+      sed[i] -= sediment_exchange;
+      
+    }
+    else 
+    {
+      cout << "What?" << endl;
     }
   }
-  */
-  
 
-  // sediment transportation
-  
+  // sediment movement
+  /*
   float tmp_sed[SIZE];
   for(int i = 0; i < SIZE; i++)
   {
-    float prev_position = (float)i - vel[i] * time_step;
+    float previous_position = (float)i - (vel[i] * time_step);
+    int previous_index = (int)previous_position;
+    int left_index = previous_index;
+    int right_index = previous_index + 1;
+    float interp = previous_position - (float)left_index;
 
-    if(prev_position < 0)
+    //cout << "Moving from " << (int)(i - vel[i] * time_step) << " to " << i << " at " << vel[i] << endl;
+    if(left_index < 0)
     {
-      prev_position = 0;
+      tmp_sed[i] = sed[0];
     }
-    if(prev_position > SIZE - 1)
+    else if(right_index >= SIZE)
     {
-      prev_position = SIZE - 1;
+      tmp_sed[i] = sed[SIZE-1];
     }
-
-    int left_index = (int)prev_position;
-    int right_index = left_index + 1;
-    float interp = prev_position - (float)left_index;
-
-    tmp_sed[i] = lerp(sed[left_index], sed[right_index], interp);
+    else
+    {
+      tmp_sed[i] = lerp(sed[left_index], sed[right_index], interp);
+    }
   }
   for(int i = 0; i < SIZE; i++)
   {
     sed[i] = tmp_sed[i];
   }
+  */
   
 
   // evaporation
   for(int i = 0; i < SIZE; i++)
   {
-    //water[i] = water[i] * (1 - evaporation_constant * time_step);
-    
-    water[i] -= evaporation_constant * time_step;
-    if(water[i] < 0)
-    {
-      water[i] = 0;
-    }
+    water[i] = water[i] * (1 - evaporation_constant * time_step);
   }
  
 }
@@ -259,14 +261,7 @@ void ofApp::mouseDragged(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
-  if(button == 0)
-  {
-    water[(int)(x / WIDTH)] += 10;
-  }
-  if(button == 2)
-  {
-    sed[(int)(x / WIDTH)] += 1;
-  }
+  water[(int)(x / WIDTH)] += 10;
 }
 
 //--------------------------------------------------------------
